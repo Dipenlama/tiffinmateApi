@@ -8,4 +8,7 @@ export const userSchema= z.object({
     role: z.enum(['user', 'admin']).default('user')
 });
 
-export type UserType=z.infer<typeof userSchema>;
+export type UserType=z.infer<typeof userSchema> & {
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date | string;
+};
