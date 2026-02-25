@@ -1,64 +1,44 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import express, {Application, Request, Response} from 'express';
 import { connectDB } from './database/mongodb';
+import bodyParser from 'body-parser';
 import { PORT } from './config';
+import cors from 'cors';
 
+import dotenv from 'dotenv';
+dotenv.config();
+//can use env variables below this
+console.log(process.env.PORT);
+//env-> PORT= 5050
 import authRoutes from './routes/auth.route';
 import adminUserRoute from './routes/admin/user.route';
-import bookingsRoute from './routes/bookings.route';
-import paymentsRoute from './routes/payments.route';
-import adminOrdersRoute from './routes/admin/orders.route';
+const app: Application= express();
 
-dotenv.config();
+let corsOptions={
+    origin:["http://localhost:3000", "http://localhost:3003"],
+    //list of domains allowed to access the server
+    //frontend domain/url
+}
+//origin: "*", allows all domains
+app.use(cors(corsOptions));
 
-const app = express();
-
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3003')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-app.use(
-    cors({
-        origin: (origin, cb) => {
-            if (!origin) return cb(null, true); // allow curl/postman/server-to-server
-            if (allowedOrigins.includes(origin)) return cb(null, true);
-            cb(new Error('Not allowed by CORS'));
-        },
-        credentials: true,
-    })
-);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Health check
-app.get('/health', (_req, res) => res.json({ ok: true }));
-
-// existing routes
+// const PORT: number = 3000;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
+app.get('/', (req: Request, res: Response)=>{
+    res.send('Hello world');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/users', adminUserRoute);
-app.use('/api/bookings', bookingsRoute);
-app.use('/api/payments', paymentsRoute);
-app.use('/api/admin/orders', adminOrdersRoute);
-
-// 404
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Not found' });
-});
-
-// error handler
-app.use((err: any, _req: any, res: any, _next: any) => {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.message || 'Server error' });
-});
 
 async function startServer() {
     await connectDB();
-    app.listen(PORT, () => {
-        console.log(`Server listening on http://localhost:${PORT}`);
-    });
+    app.listen(
+    PORT,
+    ()=> {
+        console.log(`server on http://localhost:${PORT}`);
+    }
+    );
+    
 }
-
-startServer();
+ 
+startServer()

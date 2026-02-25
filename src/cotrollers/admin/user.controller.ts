@@ -2,7 +2,9 @@ import { CreateUserDto } from "../../dtos/user.dto";
 import z from "zod";
 import { Request,Response } from "express";
 import { AuthService} from "../../services/auth.service";
+import { UserRepository } from "../../repositories/auth.repository";
 let authService=new AuthService();
+const userRepository = new UserRepository();
 
 export class AdminUserController{
     async createUser (req: Request, res: Response){
@@ -31,6 +33,57 @@ export class AdminUserController{
             });
         }
 
+    }
+
+    async getUsers(req: Request, res: Response){
+        try{
+            const page = parseInt((req.query.page as string) || '1', 10);
+            const limit = parseInt((req.query.limit as string) || '10', 10);
+            const result = await userRepository.getUsersPaginated(page, limit);
+            return res.status(200).json({ success: true, data: result });
+        }catch(error:any){
+            return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+        }
+    }
+
+    async updateUser(req: Request, res: Response){
+        try{
+            const id = req.params.id;
+            const data = req.body;
+            const updated = await userRepository.updateUserById(id, data as any);
+            if(!updated){
+                return res.status(404).json({ success:false, message: 'User not found' });
+            }
+            return res.status(200).json({ success:true, data: updated });
+        }catch(error:any){
+            return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+        }
+    }
+
+    async deleteUser(req: Request, res: Response){
+        try{
+            const id = req.params.id;
+            const deleted = await userRepository.deleteUserById(id);
+            if(!deleted){
+                return res.status(404).json({ success:false, message: 'User not found' });
+            }
+            return res.status(200).json({ success:true, message: 'User deleted successfully' });
+        }catch(error:any){
+            return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+        }
+    }
+
+    async getUser(req: Request, res: Response){
+        try{
+            const id = req.params.id;
+            const user = await userRepository.getUserById(id);
+            if(!user){
+                return res.status(404).json({ success:false, message: 'User not found' });
+            }
+            return res.status(200).json({ success:true, data: user });
+        }catch(error:any){
+            return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+        }
     }
 
     }

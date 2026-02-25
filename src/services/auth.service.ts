@@ -43,4 +43,29 @@ export class AuthService{
         const token= jwt.sign(payload, JWT_SECRET,{expiresIn: '30d'});
         return {token, user}
     }
+    async forgotPassword(email: string){
+        const user = await userRepository.getUserByEmail(email);
+        if(!user){
+            // do not reveal whether user exists
+            return { success: true };
+        }
+        const { v4: uuidv4 } = await import('uuid');
+        const token = uuidv4();
+        const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+        await userRepository.updateUserById(user._id.toString(), { resetPasswordToken: token, resetPasswordExpires: expires } as any);
+        // In real app send email. For now, log the reset link.
+        console.log(`Password reset link: http://localhost:3000/reset-password?token=${token}`);
+        return { success: true };
+    }
+
+    async resetPassword(token: string, newPassword: string){
+        const user = await userRepository.getUserByResetToken(token);
+        if(!user) throw new HttpError(400, 'Invalid or expired token');
+        if(!user.resetPasswordExpires || user.resetPasswordExpires < new Date()){
+            throw new HttpError(400, 'Token expired');
+        }
+        const hashed = await bcryptjs.hash(newPassword, 10);
+        await userRepository.updateUserById(user._id.toString(), { password: hashed, resetPasswordToken: undefined, resetPasswordExpires: undefined } as any);
+        return { success: true };
+    }
 }

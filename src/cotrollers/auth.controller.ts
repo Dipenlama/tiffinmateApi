@@ -50,6 +50,27 @@ export class AuthController{
       });
     }
   }
+  async forgotPassword(req: Request, res: Response){
+    try{
+      const { email } = req.body;
+      if(!email) return res.status(400).json({ success:false, message: 'Email is required' });
+      await authService.forgotPassword(email);
+      return res.status(200).json({ success:true, message: 'If the email exists, a reset link was sent' });
+    }catch(error:any){
+      return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response){
+    try{
+      const { token, password } = req.body;
+      if(!token || !password) return res.status(400).json({ success:false, message: 'Token and password are required' });
+      await authService.resetPassword(token, password);
+      return res.status(200).json({ success:true, message: 'Password has been reset' });
+    }catch(error:any){
+      return res.status(error.statusCode || 500).json({ success:false, message: error.message || 'Internal Server Error' });
+    }
+  }
 }
 
 //create a new file under, src/controllers/admin/user.controller.ts
