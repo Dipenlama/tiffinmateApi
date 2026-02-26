@@ -49,7 +49,7 @@ export class AuthService{
             // do not reveal whether user exists
             return { success: true };
         }
-        const { v4: uuidv4 } = await import('uuid');
+        const { v4: uuidv4 } = await import("uuid");
         const token = uuidv4();
         const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
         await userRepository.updateUserById(user._id.toString(), { resetPasswordToken: token, resetPasswordExpires: expires } as any);
