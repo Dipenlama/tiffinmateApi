@@ -3,6 +3,7 @@ import z from "zod";
 import { Request,Response } from "express";
 import { AuthService} from "../../services/auth.service";
 import { UserRepository } from "../../repositories/auth.repository";
+import bcryptjs from "bcryptjs";
 let authService=new AuthService();
 const userRepository = new UserRepository();
 
@@ -49,7 +50,10 @@ export class AdminUserController{
     async updateUser(req: Request, res: Response){
         try{
             const id = req.params.id;
-            const data = req.body;
+            const data = { ...req.body } as any;
+            if (data.password) {
+                data.password = await bcryptjs.hash(String(data.password), 10);
+            }
             const updated = await userRepository.updateUserById(id, data as any);
             if(!updated){
                 return res.status(404).json({ success:false, message: 'User not found' });

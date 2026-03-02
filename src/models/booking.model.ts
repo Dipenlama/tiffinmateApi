@@ -1,6 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-const bookingItemSchema = new Schema(
+export interface IBookingItem {
+  id: string;
+  name: string;
+  qty: number;
+  price: number;
+  subtotal: number;
+}
+
+const bookingItemSchema = new Schema<IBookingItem>(
   {
     id: { type: String, required: true },
     name: { type: String, required: true },
@@ -42,6 +50,18 @@ const bookingSchema: Schema = new Schema(
 export interface IBooking extends Document {
   draftId?: string;
   userId?: mongoose.Types.ObjectId;
+  items: IBookingItem[];
+  total: number;
+  day: string;
+  time: string;
+  frequency: string;
+  package?: string;
+  packageName?: string;
+  address?: string;
+  notes?: string;
+  status: 'pending' | 'accepted' | 'dispatched' | 'delivered' | 'cancelled';
+  paymentStatus: 'pending' | 'processing' | 'paid' | 'failed';
+  meta?: Record<string, any>;
 }
 
 export const BookingModel = mongoose.model<IBooking>('Booking', bookingSchema);

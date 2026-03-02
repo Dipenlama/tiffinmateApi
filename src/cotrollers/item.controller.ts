@@ -43,12 +43,15 @@ class ItemController {
   list = async (req: Request, res: Response) => {
     const { page, limit, q, category, available } = req.query;
     const parsedAvailable = typeof available === 'string' ? available === 'true' : undefined;
+    const effectiveAvailable = parsedAvailable !== undefined
+      ? parsedAvailable
+      : (req.user?.role === 'admin' ? undefined : true); // default to available-only for normal users
     const payload = {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
       q: q as string | undefined,
       category: category as string | undefined,
-      available: parsedAvailable,
+      available: effectiveAvailable,
     };
     const result = await itemService.list(payload);
     res.json(result);

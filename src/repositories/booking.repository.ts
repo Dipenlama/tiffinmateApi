@@ -1,4 +1,4 @@
-import BookingModel, { IBooking } from '../models/booking.model';
+import { BookingModel, IBooking } from '../models/booking.model';
 
 class BookingRepository {
 	async createBooking(data: Partial<IBooking>) {
