@@ -22,6 +22,8 @@ class BookingService {
 		if (!parsed.success) throw new HttpError(400, 'Invalid payload');
 		this.validateItems(parsed.data.items);
 		const total = parsed.data.items.reduce((sum, it) => sum + (Number(it.subtotal) || 0), 0);
+		const address = parsed.data.address ?? null;
+		const notes = parsed.data.notes ?? null;
 		const bookingData = {
 			userId: userId || null,
 			draftId: parsed.data.draftId,
@@ -32,9 +34,10 @@ class BookingService {
 			frequency: parsed.data.frequency,
 			items: parsed.data.items,
 			total: parsed.data.total ?? total,
+			address,
 			status: 'pending',
 			paymentStatus: 'pending',
-			meta: { address: parsed.data.address, notes: parsed.data.notes },
+			meta: { address, notes },
 		};
 		return bookingRepository.createBooking(bookingData as any);
 	}

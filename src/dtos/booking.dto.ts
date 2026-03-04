@@ -34,7 +34,12 @@ export const CreateBookingDto = z.object({
   }, z.enum(['once', 'daily', 'weekly'])),
   package: z.string().optional(),
   packageName: z.string().optional(),
-  address: z.string().optional(),
+  address: z.preprocess((val) => {
+    if (val === null || val === undefined) return undefined;
+    if (typeof val !== 'string') return val;
+    const trimmed = val.trim();
+    return trimmed.length ? trimmed : undefined;
+  }, z.string().optional()),
   notes: z.string().optional(),
 });
 

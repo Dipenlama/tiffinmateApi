@@ -30,7 +30,7 @@ const bookingSchema: Schema = new Schema(
     frequency: { type: String, required: true },
     package: { type: String },
     packageName: { type: String },
-    address: { type: String },
+    address: { type: String, default: null },
     notes: { type: String },
     status: {
       type: String,
@@ -57,7 +57,7 @@ export interface IBooking extends Document {
   frequency: string;
   package?: string;
   packageName?: string;
-  address?: string;
+  address?: string | null;
   notes?: string;
   status: 'pending' | 'accepted' | 'dispatched' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'processing' | 'paid' | 'failed';

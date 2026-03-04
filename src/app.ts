@@ -11,6 +11,7 @@ import menuRoute from './routes/menu.route';
 import bookingRoute from './routes/booking.route';
 import paymentRoute from './routes/payment.route';
 import itemRoute from './routes/item.route';
+import userRoute from './routes/user.route';
 
 const app: Application = express();
 
@@ -45,5 +46,6 @@ app.use('/api/bookings', bookingRoute);
 app.use('/api/booking', bookingRoute); // alias to support singular path from frontend
 app.use('/api/payments', paymentRoute);
 app.use('/api/items', itemRoute);
+app.use('/api/users', userRoute);
 
 export default app;

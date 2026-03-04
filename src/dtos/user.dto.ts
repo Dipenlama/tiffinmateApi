@@ -29,3 +29,23 @@ export const LoginUserDto = z.object({
 
     })
 export type LoginUserDto =z.infer<typeof LoginUserDto>;
+
+export const UpdateUserDto = z.object({
+        email: z.email().optional(),
+        username: z.string().min(3).max(20).optional(),
+        password: z.string().min(6).optional(),
+        confirmPassword: z.string().min(6).optional(),
+    }).refine((data) => {
+        if (data.password || data.confirmPassword) {
+            return data.password === data.confirmPassword;
+        }
+        return true;
+    }, {
+        message: "Password and confirmPassword must match",
+        path: ["confirmPassword"],
+    }).refine((data) => Boolean(data.email || data.username || data.password), {
+        message: "Provide at least one field to update",
+        path: ["email"],
+    });
+
+export type UpdateUserDtoType = z.infer<typeof UpdateUserDto>;
