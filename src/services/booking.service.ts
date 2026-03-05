@@ -4,7 +4,7 @@ import { CreateBookingDto, CreateBookingDtoType } from '../dtos/booking.dto';
 import { HttpError } from '../errors/http-error';
 import { z } from 'zod';
 
-class BookingService {
+export class BookingService {
 	validateItems(items: any[]) {
 		if (!items || !Array.isArray(items) || items.length === 0) {
 			throw new HttpError(400, 'items must be a non-empty array');
